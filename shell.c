@@ -69,11 +69,18 @@ int main()
                strcpy(que[no_comm],pch);
                pch = strtok(NULL,";");
                no_comm++;
+               // printf("combain command -- %s\n " ,que[no_comm-1]);
           }
           int don_comm=0;
           while(don_comm<no_comm)
           {
-               char argment[1000]={'\0'};char command[1000]= {'\0'};
+               char *arr[10];
+
+               for (i=0;i<10;i++)
+               {
+                    arr[i]=NULL;
+               }
+
                char onecmd[1000]={'\0'};
                strcpy(onecmd,que[don_comm]);
                int and_stat = det_and(onecmd);
@@ -82,12 +89,19 @@ int main()
                {
                     onecmd[lent-1]='\0';
                }
-               make_rg(onecmd,command,argment);// printf("command=%s|||\n",command );// printf("argment=%s|||\n",argment );
+               make_rg(onecmd,arr);// printf("arr[0]=%s|||\n",arr[0] );// printf("argment=%s|||\n",argment );
+               // cheaking  it
+               // int h = strlen(arr);
+               // for (i=0;i<5;i++)
+               // {
+               //      printf("cheaking all arguments |||%s|||\n",arr[i]);
+               // }
+               //chk
                strcpy(Rtv_WD,"");
-               if(strcmp(command,"cd")==0){
+               if(strcmp(arr[0],"cd")==0){
                     //printf("cd****************\n");
                     char d[10000];
-                    strcpy(d,argment);
+                    strcpy(d,arr[1]);
                     if(strcmp(d,"~")==0)
                     {
                          strcpy(Rtv_WD,"");
@@ -107,16 +121,16 @@ int main()
                          }
                     }
                }
-               else if(strcmp(command,"pwd")==0){
+               else if(strcmp(arr[0],"pwd")==0){
                     //printf("pwd****************\n");
                     printf("%s\n",PWD);
 
                }
-               else if(strcmp(command,"echo")==0){
+               else if(strcmp(arr[0],"echo")==0){
                     //printf("echo****************\n");
                     char prt_word[1000]={'\0'};
                     char* cwd;
-                    //printf("one command==%s\n",que[don_comm]);
+                    //printf("one arr[0]==%s\n",que[don_comm]);
                     cwd=strtok(que[don_comm]," ");
                     strcpy(prt_word,cwd);
                     cwd=strtok (NULL," ");
@@ -192,15 +206,15 @@ int main()
                          //printf("ERROE:not correct text to echo\n");
                     }
                }
-               else if(strcmp(command,"exit")==0){
+               else if(strcmp(arr[0],"exit")==0){
                     //printf("exit****************\n");
                     return 0;
                }
-               else if(strcmp(command,"pinfo")==0){
+               else if(strcmp(arr[0],"pinfo")==0){
                     //printf("pinfo****************\n");
                     char path[1000]={'\0'};
                     strcat(path,"/proc/");
-                    strcat(path,argment);
+                    strcat(path,arr[1]);
                     strcat(path,"/status");
                     int ext_dir=access(path,F_OK);
                     if(ext_dir==-1)
@@ -242,15 +256,9 @@ int main()
                }
                else
                {
-                    // int and_stat = det_and(onecmd);
-                    //printf("input at else is==%s\n",input);
-                    // int lent = strlen(onecmd);
-                    // if(and_stat==1)
-                    // {
-                    //      onecmd[lent-1]='\0';
-                    // }
+                    // printf("U re in else\n");
                     pid_t stat_fam=fork();
-                    char *arr[3];
+                    //char *arr[3];
                     int status;
                     if (stat_fam>0){
                          if(and_stat==0)
@@ -268,21 +276,21 @@ int main()
                     }
                     else if(stat_fam==0)
                     {
-                         //printf("ANONOMIES****************\n");
-                         char *arr[3];
-                         arr[0]=command;
-                         if(strlen(argment)>0)
+                         // printf("U re inn child****************\n");
+                         // char *arr[3];
+                         //arr[0]=arr[0];
+                         // if(strlen(argment)>0)
+                         // {
+                         //      arr[1]=argment;
+                         // }
+                         // else
+                         // {
+                         //      arr[1]=NULL;
+                         // }
+                         // arr[2]=NULL;
+                         if(execvp(arr[0],arr)<0)
                          {
-                              arr[1]=argment;
-                         }
-                         else
-                         {
-                              arr[1]=NULL;
-                         }
-                         arr[2]=NULL;
-                         if(execvp(command,arr)<0)
-                         {
-                              printf("%s :COMMAND NOT FOUND\n",command);
+                              printf("%s :COMMAND NOT FOUND\n",arr[0]);
                          }
                     }
                }
