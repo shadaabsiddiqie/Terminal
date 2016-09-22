@@ -14,6 +14,7 @@ int main()
      pid_t stat_fam=fork();
      char *arr[3];
      int status;
+
      if (stat_fam>0){
 
                while(wait(&status)!=stat_fam){}
@@ -24,6 +25,10 @@ int main()
      }
      else if(stat_fam==0)
      {
+          int fds[2];
+          pipe(fds);
+          int savestdout=dup(1);
+          // dup2("comandout",0);
           char a[10]={'\0'};
           char b[10]={'\0'};
           char c[10]={'\0'};
@@ -50,9 +55,12 @@ int main()
           arr[2]= c;
           arr[2]= NULL;
           arr[3]= NULL;
+          close(1);
+          int fo=open("comandout",O_WRONLY,S_IRUSR|S_IWUSR);
+          dup(fo);
           execvp(arr[0],arr);
+          close(fo);
           // execl("ls", "ls", "-l", (char*) NULL);
-
      }
      return 0;
 }
