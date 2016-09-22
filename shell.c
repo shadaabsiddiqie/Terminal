@@ -89,174 +89,28 @@ int main()
                {
                     onecmd[lent-1]='\0';
                }
-               make_rg(onecmd,arr);// printf("arr[0]=%s|||\n",arr[0] );// printf("argment=%s|||\n",argment );
-               // cheaking  it
-               // int h = strlen(arr);
-               // for (i=0;i<5;i++)
-               // {
-               //      printf("cheaking all arguments |||%s|||\n",arr[i]);
-               // }
-               //chk
+               make_rg(onecmd,arr);
+
                strcpy(Rtv_WD,"");
                if(strcmp(arr[0],"cd")==0){
-                    //printf("cd****************\n");
-                    char d[10000];
-                    strcpy(d,arr[1]);
-                    if(strcmp(d,"~")==0)
-                    {
-                         strcpy(Rtv_WD,"");
-                         //printf("~~~~~\n");
-                         chdir(HomD);
-                    }
-                    else
-                    {
-                         chdir(d);
-                         if(errno == ENOENT)
-                         {
-                              fprintf(stderr,"%s:FILE DOES NOT EXIT\n",d);
-                         }
-                         else if(errno== ENOTDIR)
-                         {
-                              fprintf(stderr,"A component of %s is not a directory.\n",d);
-                         }
-                    }
+                    cmd_cd(arr[1],HomD);
                }
                else if(strcmp(arr[0],"pwd")==0){
                     //printf("pwd****************\n");
                     printf("%s\n",PWD);
-
                }
                else if(strcmp(arr[0],"echo")==0){
-                    //printf("echo****************\n");
-                    char prt_word[1000]={'\0'};
-                    char* cwd;
-                    //printf("one arr[0]==%s\n",que[don_comm]);
-                    cwd=strtok(que[don_comm]," ");
-                    strcpy(prt_word,cwd);
-                    cwd=strtok (NULL," ");
-                    strcpy(prt_word,"");
-                    while(cwd!=NULL)
-                    {
-                         strcat(prt_word,cwd);
-                         strcat(prt_word," ");
-                         cwd=strtok (NULL," ");
-                    }
-                    //printf("all words:::%s\n",prt_word);
-                    int tmp1=0;
-                    int tmp2=0,j;
-                    char h='a';
-                    char h1[2]={'\0'};
-                    char sentence[10000]={'\0'};
-                    for(j=0;j<strlen(prt_word);j++)
-                    {
-                         h=prt_word[j];
-                         if(h=='\'')
-                         {
-                              tmp1++;
-                         }
-                         else if(h=='"')
-                         {
-                              tmp2++;
-                         }
-                         else
-                         {
-                              h1[0]=h;
-                              strcat(sentence,h1);
-                         }
-                    }
-                    //printf("tmp1=%d;tmp2=%d",tmp1,tmp2);
-                    if(tmp1%2==0 && tmp2%2==0)
-                    {
-                         printf("%s\n",sentence);
-                    }
-                    else
-                    {
-                         while(tmp1%2!=0 || tmp2%2!=0)
-                         {
-                              char ext_word[1000]={'\0'};
-                              printf(">");
-                              scanf("%1000[^\n]",ext_word);
-                              //printf("EXTRA WORD + |%s\n",ext_word);
-                              char nl;
-                              scanf("%c",&nl);
-                              int p;
-                              char p1='a';
-                              char p11[2]={'\0'};
-                              strcat(sentence,"\n");
-                              for(p=0;p<strlen(ext_word);p++)
-                              {
-                                   p1=ext_word[p];
-                                   if(p1=='\'')
-                                   {
-                                        tmp1++;
-                                   }
-                                   else if(p1=='"')
-                                   {
-                                        tmp2++;
-                                   }
-                                   else
-                                   {
-                                        p11[0]=p1;
-                                        // strcat(sentence,"\n");
-                                        strcat(sentence,p11);
-                                   }
-                              }
-                         }
-                         printf("%s\n",sentence);
-                         //printf("ERROE:not correct text to echo\n");
-                    }
+                    cmd_echo(que[don_comm]);
                }
                else if(strcmp(arr[0],"exit")==0){
                     //printf("exit****************\n");
                     return 0;
                }
                else if(strcmp(arr[0],"pinfo")==0){
-                    //printf("pinfo****************\n");
-                    char path[1000]={'\0'};
-                    strcat(path,"/proc/");
-                    strcat(path,arr[1]);
-                    strcat(path,"/status");
-                    int ext_dir=access(path,F_OK);
-                    if(ext_dir==-1)
-                    {
-                         printf("process does not exist\n");
-                    }
-                    else
-                    {
-                         int fo=open(path,O_RDONLY);
-                         char id_data[100000]={'\0'};
-                         read(fo,id_data,100000);
-                         char *id_brk;
-                         id_brk = strtok (id_data,"\n");
-                         while(id_brk!=NULL)
-                         {
-                              char id_info[1000]={'\0'};
-                              strcpy(id_info,id_brk);
-                              char ch_dat[10000]={'\0'};
-                              for(i=0;i<strlen(id_info);i++)
-                              {
-                                   if(id_info[i]==':')
-                                   {
-                                        break;
-                                   }
-                                   else
-                                   {
-                                        char id_st[2]={'\0'};
-                                        id_st[0]=id_info[i];
-                                        strcat(ch_dat,id_st);
-                                   }
-                              }
-                              if(strcmp(ch_dat,"Name")==0||strcmp(ch_dat,"State")==0||strcmp(ch_dat,"Pid")==0||strcmp(ch_dat,"VmSize")==0)
-                              {
-                                   printf("%s\n",id_info);
-                              }
-                              id_brk = strtok(NULL,"\n");
-                         }
-                    }
+                    cmd_pinfo(arr[1]);
                }
                else
                {
-                    // printf("U re in else\n");
                     pid_t stat_fam=fork();
                     //char *arr[3];
                     int status;
@@ -276,18 +130,6 @@ int main()
                     }
                     else if(stat_fam==0)
                     {
-                         // printf("U re inn child****************\n");
-                         // char *arr[3];
-                         //arr[0]=arr[0];
-                         // if(strlen(argment)>0)
-                         // {
-                         //      arr[1]=argment;
-                         // }
-                         // else
-                         // {
-                         //      arr[1]=NULL;
-                         // }
-                         // arr[2]=NULL;
                          if(execvp(arr[0],arr)<0)
                          {
                               printf("%s :COMMAND NOT FOUND\n",arr[0]);
